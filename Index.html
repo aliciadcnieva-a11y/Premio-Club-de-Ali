@@ -1,1 +1,189 @@
-#Premio club de Ali
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premio Club de Ali</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f6f0ff;
+ color:#34204d;
+}
+header{
+ background:linear-gradient(135deg,#542080,#9b59b6);
+ color:white;
+ text-align:center;
+ padding:30px 15px;
+}
+header h1{margin:0;font-size:27px}
+header p{margin:9px 0 0}
+.container{
+ max-width:440px;
+ margin:25px auto;
+ padding:15px;
+}
+.card{
+ background:white;
+ border-radius:18px;
+ padding:22px;
+ margin-bottom:18px;
+ box-shadow:0 5px 20px #54208018;
+}
+h2{text-align:center;color:#71349b}
+input{
+ width:100%;
+ padding:14px;
+ margin:8px 0;
+ border:1px solid #d8c5e9;
+ border-radius:10px;
+ font-size:16px;
+}
+button{
+ width:100%;
+ padding:14px;
+ margin-top:10px;
+ border:0;
+ border-radius:10px;
+ background:#783da0;
+ color:white;
+ font-size:16px;
+ font-weight:bold;
+}
+button.secondary{background:#b48acb}
+.hidden{display:none}
+.item{
+ padding:14px;
+ border-radius:10px;
+ background:#f5edfc;
+ margin:10px 0;
+}
+footer{text-align:center;padding:20px;color:#805a9b}
+</style>
+</head>
+<body>
+
+<header>
+<h1>💜 Premio Club de Ali</h1>
+<p>Un club de beneficios y premios</p>
+<p>📍 Córdoba Capital</p>
+</header>
+
+<div class="container">
+
+<section class="card" id="registro">
+<h2>Crear mi cuenta</h2>
+<input id="nombre" placeholder="Nombre">
+<input id="apellido" placeholder="Apellido">
+<input id="telefono" placeholder="Teléfono" type="tel">
+<input id="password" placeholder="Crear contraseña" type="password">
+<button onclick="registrar()">Registrarme</button>
+<p style="text-align:center">¿Ya sos miembro?</p>
+<button class="secondary" onclick="mostrarLogin()">Iniciar sesión</button>
+</section>
+
+<section class="card hidden" id="login">
+<h2>Bienvenida nuevamente</h2>
+<input id="telLogin" placeholder="Tu teléfono">
+<input id="passLogin" type="password" placeholder="Tu contraseña">
+<button onclick="ingresar()">Ingresar</button>
+<button class="secondary" onclick="mostrarRegistro()">Volver</button>
+</section>
+
+<section class="card hidden" id="club">
+<h2>¡Bienvenida al club! 💜</h2>
+<p id="saludo"></p>
+<div class="item">
+<h3>🎁 Tus beneficios</h3>
+<p>Próximamente encontrarás aquí los premios y beneficios exclusivos de Premio Club de Ali.</p>
+</div>
+<div class="item">
+<h3>⭐ Premios</h3>
+<p>Muy pronto podrás conocer los premios disponibles.</p>
+</div>
+<button onclick="salir()">Cerrar sesión</button>
+</section>
+
+<section class="card">
+<h2>🔐 Administración</h2>
+<input id="adminPass" type="password" placeholder="Contraseña de administradora">
+<button onclick="administrar()">Ingresar como administradora</button>
+</section>
+
+<section class="card hidden" id="panelAdmin">
+<h2>Panel de administración</h2>
+<p>Miembros registrados en este dispositivo:</p>
+<div id="listaMiembros"></div>
+</section>
+
+</div>
+
+<footer>Premio Club de Ali 💜<br>Todos los derechos reservados</footer>
+
+<script>
+function obtenerMiembros(){
+ return JSON.parse(localStorage.getItem("miembrosAli")||"[]");
+}
+function guardarMiembros(lista){
+ localStorage.setItem("miembrosAli",JSON.stringify(lista));
+}
+function registrar(){
+ let nombre=document.getElementById("nombre").value.trim();
+ let apellido=document.getElementById("apellido").value.trim();
+ let telefono=document.getElementById("telefono").value.trim();
+ let password=document.getElementById("password").value;
+
+ if(!nombre||!apellido||!telefono||!password){
+  alert("Completá todos los campos.");
+  return;
+ }
+ let lista=obtenerMiembros();
+ if(lista.some(m=>m.telefono===telefono)){
+  alert("Este teléfono ya está registrado.");
+  return;
+ }
+ lista.push({nombre,apellido,telefono,password});
+ guardarMiembros(lista);
+ alert("¡Registro realizado! Ya podés iniciar sesión.");
+ mostrarLogin();
+}
+function mostrarLogin(){
+ document.getElementById("registro").classList.add("hidden");
+ document.getElementById("login").classList.remove("hidden");
+}
+function mostrarRegistro(){
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("registro").classList.remove("hidden");
+}
+function ingresar(){
+ let tel=document.getElementById("telLogin").value.trim();
+ let pass=document.getElementById("passLogin").value;
+ let m=obtenerMiembros().find(x=>x.telefono===tel&&x.password===pass);
+ if(!m){alert("Teléfono o contraseña incorrectos.");return;}
+ document.getElementById("login").classList.add("hidden");
+ document.getElementById("registro").classList.add("hidden");
+ document.getElementById("club").classList.remove("hidden");
+ document.getElementById("saludo").textContent="¡Hola, "+m.nombre+" "+m.apellido+"!";
+}
+function salir(){
+ document.getElementById("club").classList.add("hidden");
+ document.getElementById("registro").classList.remove("hidden");
+}
+function administrar(){
+ let clave=document.getElementById("adminPass").value;
+ if(clave!=="Ali2026"){
+  alert("Contraseña incorrecta.");
+  return;
+ }
+ document.getElementById("panelAdmin").classList.remove("hidden");
+ let lista=obtenerMiembros();
+ document.getElementById("listaMiembros").innerHTML=
+ lista.length?lista.map(m=>"<div class='item'>"+m.nombre+" "+m.apellido+"<br>Teléfono: "+m.telefono+"</div>").join(""):"Todavía no hay miembros.";
+}
+</script>
+
+</body>
+</html>
